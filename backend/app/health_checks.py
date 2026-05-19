@@ -104,7 +104,6 @@ def check_embedding_model() -> ModelStatus:
 
 def check_llm_model() -> ModelStatus:
     from app.services.language_model import (
-        LLM_MODEL,
         get_language_model,
         with_retry_exception,
     )
@@ -118,13 +117,13 @@ def check_llm_model() -> ModelStatus:
         return {
             "status": "error",
             "detail": _truncate(str(e)),
-            "name": LLM_MODEL,
+            "name": "Groq",
         }
 
     return {
         "status": "ok",
         "detail": None,
-        "name": LLM_MODEL,
+        "name": "Groq",
     }
 
 
