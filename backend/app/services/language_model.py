@@ -5,14 +5,9 @@ from groq import BadRequestError
 from langchain_core.runnables import Runnable
 from langchain_groq import ChatGroq
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", None)
+from app.config import get_settings
 
-if GROQ_API_KEY is None:
-    raise ValueError("'GROQ_API_KEY' is not found")
-
-_LLM_MODEL_RAW = os.getenv("LLM_MODEL", "openai/gpt-oss-20b").strip()
-LLM_MODEL = _LLM_MODEL_RAW or "openai/gpt-oss-20b"
-
+language_model_cfg = get_settings().language_model
 
 class ModelKwargs(TypedDict, total=False):
     model: str
@@ -27,13 +22,14 @@ def with_retry_exception(runnable: Runnable) -> Runnable:
 
 
 def get_language_model(**kwargs: Unpack[ModelKwargs]):
-    model = kwargs.get("model", LLM_MODEL)
+    model = kwargs.get("model", "openai/gpt-oss-20b")
     temperature = float(kwargs.get("temperature", 0))
     max_tokens = kwargs.get("max_tokens", None)
     reasoning_format = kwargs.get("reasoning_format", "parsed")
     reasoning_effort = kwargs.get("reasoning_effort", "low")
 
     llm = ChatGroq(
+        api_key=language_model_cfg.api_key,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
