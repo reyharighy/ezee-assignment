@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
