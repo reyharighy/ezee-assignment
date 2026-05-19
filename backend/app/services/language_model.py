@@ -8,6 +8,7 @@ from app.config import get_settings
 
 language_model_cfg = get_settings().language_model
 
+
 class ModelKwargs(TypedDict, total=False):
     model: str
     temperature: int | float

@@ -15,6 +15,7 @@ _embedding_cfg = get_settings().embedding
 
 VECTOR_STORE_TABLE_NAME = "documents"
 
+
 class VectorDocument(Table):
     def __init__(self, embedding_service: Embeddings):
         self.service = PGVectorStore.create_sync(
@@ -60,9 +61,7 @@ class VectorDocument(Table):
         if entry is None:
             raise ValueError("entry is required")
 
-        if isinstance(entry, list) and not all(
-            isinstance(r, Document) for r in entry
-        ):
+        if isinstance(entry, list) and not all(isinstance(r, Document) for r in entry):
             raise ValueError("entry is a list that contains non-BaseMessage items")
 
         if not isinstance(entry, list) and not isinstance(entry, Document):

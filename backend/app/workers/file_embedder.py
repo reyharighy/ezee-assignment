@@ -6,6 +6,7 @@ from app.database.tables import VectorDocument
 
 _embedding_cfg = get_settings().embedding
 
+
 def embed_file_and_store(
     file_path: Path, file_name: str, content_type: str, _file_size: int
 ):
