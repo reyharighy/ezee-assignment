@@ -8,6 +8,7 @@ from .database import DatabaseConfig
 from .embedding import EmbeddingConfig
 from .job_queue import JobQueueConfig
 from .middleware import MiddlewareConfig
+from .language_model import LanguageModelConfig
 
 _BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
@@ -36,6 +37,7 @@ class Settings(BaseSettings):
         return JobQueueConfig()
 
     middleware: MiddlewareConfig = Field(default_factory=MiddlewareConfig)
+    language_model: LanguageModelConfig = Field(default_factory=LanguageModelConfig)
 
 
 @lru_cache
