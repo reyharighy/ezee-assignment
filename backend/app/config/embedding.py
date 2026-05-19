@@ -46,7 +46,7 @@ def _get_embedding_service(api_key: "ApiKey", model: "Model") -> Embeddings:
     return CohereEmbeddings(
         cohere_api_key=api_key,
         model=model,
-    )
+    ) # type: ignore
 
 Model = Annotated[str, BeforeValidator(parse_vector_embedding_model)]
 RawDimension = Annotated[str, BeforeValidator(parse_vector_embedding_dimension)]
