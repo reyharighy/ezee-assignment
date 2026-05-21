@@ -35,22 +35,26 @@ def parse_vector_embedding_dimension(value: str) -> str:
         + ", ".join(map(str, ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT))
     )
 
+
 def parse_api_key(value: str) -> str:
     if value.strip() == "":
         raise ValueError("COHERE_API_KEY is not set")
 
     return value.strip()
 
+
 @lru_cache(maxsize=1)
 def _get_embedding_service(api_key: "ApiKey", model: "Model") -> Embeddings:
     return CohereEmbeddings(
         cohere_api_key=api_key,
         model=model,
-    )
+    )  # type: ignore
+
 
 Model = Annotated[str, BeforeValidator(parse_vector_embedding_model)]
 RawDimension = Annotated[str, BeforeValidator(parse_vector_embedding_dimension)]
 ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
+
 
 class EmbeddingConfig(BaseModel):
     model_config = ConfigDict(

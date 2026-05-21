@@ -25,6 +25,7 @@ from .state import State
 
 _embedding_cfg = get_settings().embedding
 
+
 def refine_query(state: State, runtime: Runtime[Context]) -> dict[str, Any]:
     system_message = SystemMessage(get_template_body(REFINE_SYSTEM).strip())
     llm_input: list[BaseMessage] = [system_message]

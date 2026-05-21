@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from langchain_core.messages import BaseMessage
 from langchain_postgres import PostgresChatMessageHistory
@@ -81,4 +81,6 @@ class ChatMessageHistories(Table):
         return self.service.get_messages()
 
     def similarity_search(self, **kwargs: Any) -> Any:
-        raise NotImplementedError("ChatMessageHistories does not support similarity search")
+        raise NotImplementedError(
+            "ChatMessageHistories does not support similarity search"
+        )
