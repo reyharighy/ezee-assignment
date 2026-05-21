@@ -105,13 +105,13 @@ def check_embedding_model() -> ModelStatus:
 def check_llm_model() -> ModelStatus:
     from app.services.language_model import (
         get_language_model,
-        with_retry_exception,
+        llm_with_retry,
     )
 
     try:
         from langchain_core.messages import HumanMessage
 
-        llm = with_retry_exception(get_language_model(max_tokens=8))
+        llm = llm_with_retry(get_language_model(max_tokens=8))
         llm.invoke([HumanMessage(content="ping")])
     except Exception as e:  # noqa: BLE001
         return {
