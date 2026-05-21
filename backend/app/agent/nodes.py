@@ -6,7 +6,7 @@ from langgraph.runtime import Runtime
 
 from app.services import (
     get_language_model,
-    with_retry_exception,
+    llm_with_retry,
 )
 
 from app.services.prompt_templates import (
@@ -44,12 +44,12 @@ def refine_query(state: State, runtime: Runtime[Context]) -> dict[str, Any]:
         temperature=0,
     )
 
-    llm = with_retry_exception(
-        base_llm.with_structured_output(
-            schema=RefinedRetrievalQuery,
-            method="json_schema",
-        )
+    llm_with_structured_output = base_llm.with_structured_output(
+        schema=RefinedRetrievalQuery,
+        method="json_schema",
     )
+
+    llm = llm_with_retry(llm_with_structured_output)
 
     lm_output = llm.invoke(llm_input)
 
@@ -84,12 +84,12 @@ def response(state: State, runtime: Runtime[Context]) -> dict[str, Any]:
 
     llm_input.extend(last_message)
 
-    llm = with_retry_exception(
-        get_language_model(
-            model="openai/gpt-oss-120b",
-            temperature=1.0,
-        )
+    base_llm = get_language_model(
+        model="openai/gpt-oss-120b",
+        temperature=1.0,
     )
+
+    llm = llm_with_retry(base_llm)
 
     response = llm.invoke(llm_input)
 

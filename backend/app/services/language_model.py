@@ -1,10 +1,12 @@
 from typing import Literal, TypedDict, Unpack
 
 from groq import BadRequestError
+from langchain_core.language_models.base import LanguageModelInput
 from langchain_core.runnables import Runnable
 from langchain_groq import ChatGroq
 
 from app.config import get_settings
+from pydantic import BaseModel
 
 language_model_cfg = get_settings().language_model
 
@@ -17,7 +19,9 @@ class ModelKwargs(TypedDict, total=False):
     reasoning_effort: Literal["low", "medium", "high"]
 
 
-def with_retry_exception(runnable: Runnable) -> Runnable:
+def llm_with_retry(
+    runnable: Runnable[LanguageModelInput, dict | BaseModel],
+) -> Runnable[LanguageModelInput, dict | BaseModel]:
     return runnable.with_retry(retry_if_exception_type=(BadRequestError,))
 
 
@@ -28,7 +32,7 @@ def get_language_model(**kwargs: Unpack[ModelKwargs]):
     reasoning_format = kwargs.get("reasoning_format", "parsed")
     reasoning_effort = kwargs.get("reasoning_effort", "low")
 
-    llm = ChatGroq(
+    return ChatGroq(
         api_key=language_model_cfg.api_key,
         model=model,
         temperature=temperature,
@@ -37,5 +41,3 @@ def get_language_model(**kwargs: Unpack[ModelKwargs]):
         reasoning_effort=reasoning_effort,
         timeout=None,
     )
-
-    return llm
