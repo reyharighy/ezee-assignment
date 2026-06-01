@@ -61,7 +61,9 @@ ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
 
 
 class EmbeddingConfig(BaseSettings):
-    model_config = model_config(env_prefix="EMBEDDING_", arbitrary_types_allowed=True)
+    model_config = model_config(
+        env_prefix="EMBEDDING_",
+    )
 
     model: Model = Field(
         exclude=True, default="", description="Model of the embedding service"
