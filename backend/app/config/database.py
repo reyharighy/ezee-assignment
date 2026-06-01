@@ -14,21 +14,21 @@ def parse_username(value: str) -> str:
     if value.strip() == "":
         raise ValueError("DATABASE_USERNAME is not set")
 
-    return value
+    return value.strip()
 
 
 def parse_password(value: str) -> str:
     if value.strip() == "":
         raise ValueError("DATABASE_PASSWORD is not set")
 
-    return value
+    return value.strip()
 
 
 def parse_name(value: str) -> str:
     if value.strip() == "":
         raise ValueError("DATABASE_NAME is not set")
 
-    return value
+    return value.strip()
 
 
 @lru_cache(maxsize=1)
