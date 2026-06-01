@@ -1,6 +1,6 @@
-import { API_BASE_URL, VECTOR_EMBEDDING_DIMENSION } from '../config'
+import { API_BASE_URL, EMBEDDING_DIMENSION } from '../config'
 
-export { VECTOR_EMBEDDING_DIMENSION }
+export { EMBEDDING_DIMENSION }
 
 export type PipelineJobStatus = 'enqueued' | 'started' | 'finished' | 'failed'
 

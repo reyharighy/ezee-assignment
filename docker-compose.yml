@@ -96,7 +96,7 @@ services:
     env_file:
       - ./.env
     environment:
-      VITE_VECTOR_EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION}
+      VITE_EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION}
     depends_on:
       backend:
         condition: service_healthy

@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import {
   uploadDocuments,
-  VECTOR_EMBEDDING_DIMENSION,
+  EMBEDDING_DIMENSION,
   type PipelineJob,
   type PipelineJobStatus,
 } from '../api/upload'
@@ -324,7 +324,7 @@ function displayOrDash(value: string | number | undefined | null): string {
                 <dt class="m-0 font-semibold text-zinc-900 dark:text-zinc-100">Total chunks</dt>
                 <dd class="m-0 text-zinc-600 dark:text-zinc-400">{{ displayOrDash(job.job_result?.chunks) }}</dd>
                 <dt class="m-0 font-semibold text-zinc-900 dark:text-zinc-100">Embedding dimension</dt>
-                <dd class="m-0 text-zinc-600 dark:text-zinc-400">{{ VECTOR_EMBEDDING_DIMENSION }}</dd>
+                <dd class="m-0 text-zinc-600 dark:text-zinc-400">{{ EMBEDDING_DIMENSION }}</dd>
               </dl>
             </section>
 

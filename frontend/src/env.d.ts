@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_VECTOR_EMBEDDING_DIMENSION?: string
+  readonly VITE_EMBEDDING_DIMENSION?: string
 }
 
 declare module '*.vue' {
