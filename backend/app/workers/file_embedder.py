@@ -3,7 +3,7 @@ from app.rag import extract_text, chunk_text, transform_chunks_into_docs
 
 from app.config import get_settings
 from app.database.tables import VectorDocument
-from app.services.embedding import get_embedding_service
+from app.services import get_embedding_service
 
 _embedding_cfg = get_settings().embedding
 

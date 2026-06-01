@@ -13,7 +13,7 @@ from sqlalchemy.pool import NullPool
 
 from app.storage import STORAGE_DIR
 from app.config import get_settings
-from app.services.embedding import get_embedding_service
+from app.services import get_embedding_service
 
 
 class ComponentStatus(TypedDict):
@@ -96,7 +96,7 @@ def check_embedding_model() -> ModelStatus:
 
 
 def check_llm_model() -> ModelStatus:
-    from app.services.language_model import (
+    from app.services import (
         get_language_model,
         llm_with_retry,
     )
