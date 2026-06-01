@@ -1,43 +1,47 @@
 from functools import lru_cache
-from pathlib import Path
 
-from pydantic import Field, computed_field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 from .database import DatabaseConfig
 from .embedding import EmbeddingConfig
+from .health_check import HealthCheckConfig
 from .job_queue import JobQueueConfig
 from .middleware import MiddlewareConfig
 from .language_model import LanguageModelConfig
-
-_BACKEND_ROOT = Path(__file__).resolve().parent.parent
+from .settings_env import settings_default_factory
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=_BACKEND_ROOT / ".env",
-        env_file_encoding="utf-8",
-        env_nested_delimiter="__",
-        extra="ignore",
+    database: DatabaseConfig = Field(
+        default_factory=settings_default_factory(DatabaseConfig),
+        description="Database configuration",
     )
 
-    @computed_field
-    @property
-    def database(self) -> DatabaseConfig:
-        return DatabaseConfig()
+    embedding: EmbeddingConfig = Field(
+        default_factory=settings_default_factory(EmbeddingConfig),
+        description="Embedding configuration",
+    )
 
-    @computed_field
-    @property
-    def embedding(self) -> EmbeddingConfig:
-        return EmbeddingConfig()
+    health_check: HealthCheckConfig = Field(
+        default_factory=settings_default_factory(HealthCheckConfig),
+        description="Health check configuration",
+    )
 
-    @computed_field
-    @property
-    def job_queue(self) -> JobQueueConfig:
-        return JobQueueConfig()
+    job_queue: JobQueueConfig = Field(
+        default_factory=settings_default_factory(JobQueueConfig),
+        description="Job queue configuration",
+    )
 
-    middleware: MiddlewareConfig = Field(default_factory=MiddlewareConfig)
-    language_model: LanguageModelConfig = Field(default_factory=LanguageModelConfig)
+    language_model: LanguageModelConfig = Field(
+        default_factory=settings_default_factory(LanguageModelConfig),
+        description="Language model configuration",
+    )
+
+    middleware: MiddlewareConfig = Field(
+        default_factory=settings_default_factory(MiddlewareConfig),
+        description="Middleware configuration",
+    )
 
 
 @lru_cache
