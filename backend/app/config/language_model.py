@@ -1,22 +1,30 @@
-import os
 from typing import Annotated
 
-from pydantic import BaseModel, BeforeValidator, Field, SecretStr
+from pydantic import BeforeValidator, Field, SecretStr
+from pydantic_settings import BaseSettings
+
+from .settings_env import model_config
 
 
-def parse_api_key(value: str) -> SecretStr:
+def parse_api_key(value: str) -> str:
     if value.strip() == "":
         raise ValueError("GROQ_API_KEY is not set")
 
-    return SecretStr(value.strip())
+    return value.strip()
 
 
-ApiKey = Annotated[SecretStr, BeforeValidator(parse_api_key)]
+ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
 
 
-class LanguageModelConfig(BaseModel):
+class LanguageModelConfig(BaseSettings):
+    model_config = model_config()
+
     api_key: ApiKey = Field(
-        default_factory=lambda: os.getenv("GROQ_API_KEY", ""),
-        validate_default=True,
+        exclude=True,
+        validation_alias="GROQ_API_KEY",
         description="API key for the language model",
     )
+
+    @property
+    def api_key_optioned(self) -> SecretStr:
+        return SecretStr(self.api_key)

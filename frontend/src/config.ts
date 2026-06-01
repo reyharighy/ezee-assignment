@@ -26,20 +26,20 @@ function resolveApiBase(): string {
 
 export const API_BASE_URL = resolveApiBase()
 
-function requireVectorEmbeddingDimension(): number {
-  const raw = import.meta.env.VITE_VECTOR_EMBEDDING_DIMENSION
+function requireEmbeddingDimension(): number {
+  const raw = import.meta.env.VITE_EMBEDDING_DIMENSION
 
   if (typeof raw !== 'string' || raw.trim() === '') {
-    throw new Error("'VECTOR_EMBEDDING_DIMENSION' is not found")
+    throw new Error("'EMBEDDING_DIMENSION' is not found")
   }
 
   const n = Number.parseInt(raw, 10)
 
   if (Number.isNaN(n) || n <= 0) {
-    throw new Error("'VECTOR_EMBEDDING_DIMENSION' must be a positive integer")
+    throw new Error("'EMBEDDING_DIMENSION' must be a positive integer")
   }
 
   return n
 }
 
-export const VECTOR_EMBEDDING_DIMENSION = requireVectorEmbeddingDimension()
+export const EMBEDDING_DIMENSION = requireEmbeddingDimension()

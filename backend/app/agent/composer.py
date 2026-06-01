@@ -2,7 +2,7 @@ import sys
 
 from langchain_core.messages import BaseMessage, HumanMessage
 
-from app.services.prompt_templates import (
+from app.database.tables.prompt_templates import (
     RESPONSE_USER,
     get_refinement_user_message_template,
     get_template_body,

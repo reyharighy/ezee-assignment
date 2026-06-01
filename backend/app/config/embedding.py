@@ -1,12 +1,15 @@
-import os
 from typing import Annotated
 
-from functools import lru_cache
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, computed_field
-from langchain_cohere import CohereEmbeddings
-from langchain_core.embeddings import Embeddings
+from pydantic import BeforeValidator, Field, SecretStr
+from pydantic_settings import BaseSettings
 
-ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT = [
+from .settings_env import model_config
+
+ALLOWED_EMBEDDING_MODELS = [
+    "embed-multilingual-v3.0",
+]
+
+ALLOWED_EMBEDDING_DIMENSION_DEFAULT = [
     384,
     768,
     1024,
@@ -16,23 +19,29 @@ ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT = [
 ]
 
 
-def parse_vector_embedding_model(value: str) -> str:
+def parse_model(value: str) -> str:
     if value.strip() == "":
-        raise ValueError("VECTOR_EMBEDDING_MODEL is not set")
+        return ALLOWED_EMBEDDING_MODELS[0]
 
-    return value.strip()
-
-
-def parse_vector_embedding_dimension(value: str) -> str:
-    if value.strip() == "":
-        return str(ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT[2])
-
-    if int(value.strip()) in ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT:
+    if value.strip() in ALLOWED_EMBEDDING_MODELS:
         return value.strip()
 
     raise ValueError(
-        "VECTOR_EMBEDDING_DIMENSION must be one of the following: "
-        + ", ".join(map(str, ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT))
+        "EMBEDDING_MODEL must be one of the following: "
+        + ", ".join(ALLOWED_EMBEDDING_MODELS)
+    )
+
+
+def parse_dimension(value: str) -> str:
+    if value.strip() == "":
+        return str(ALLOWED_EMBEDDING_DIMENSION_DEFAULT[2])
+
+    if int(value.strip()) in ALLOWED_EMBEDDING_DIMENSION_DEFAULT:
+        return value.strip()
+
+    raise ValueError(
+        "EMBEDDING_DIMENSION must be one of the following: "
+        + ", ".join(map(str, ALLOWED_EMBEDDING_DIMENSION_DEFAULT))
     )
 
 
@@ -43,48 +52,38 @@ def parse_api_key(value: str) -> str:
     return value.strip()
 
 
-@lru_cache(maxsize=1)
-def _get_embedding_service(api_key: "ApiKey", model: "Model") -> Embeddings:
-    return CohereEmbeddings(
-        cohere_api_key=api_key,
-        model=model,
-    )  # type: ignore
-
-
-Model = Annotated[str, BeforeValidator(parse_vector_embedding_model)]
-RawDimension = Annotated[str, BeforeValidator(parse_vector_embedding_dimension)]
+Model = Annotated[str, BeforeValidator(parse_model)]
+Dimension = Annotated[str, BeforeValidator(parse_dimension)]
 ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
 
 
-class EmbeddingConfig(BaseModel):
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
+class EmbeddingConfig(BaseSettings):
+    model_config = model_config(
+        env_prefix="EMBEDDING_",
     )
 
     model: Model = Field(
-        default_factory=lambda: os.getenv("VECTOR_EMBEDDING_MODEL", ""),
-        validate_default=True,
-        description="Model of the embedding service",
+        exclude=True, default="", description="Model of the embedding service"
     )
 
-    raw_dimension: RawDimension = Field(
-        default_factory=lambda: os.getenv("EMBEDDING_DIMENSION", ""),
-        validate_default=True,
-        description="Dimension of stored embedding vectors",
+    dimension: Dimension = Field(
+        exclude=True, default="", description="Dimension of stored embedding vectors"
     )
 
     api_key: ApiKey = Field(
-        default_factory=lambda: os.getenv("COHERE_API_KEY", ""),
-        validate_default=True,
+        exclude=True,
+        validation_alias="COHERE_API_KEY",
         description="API key of the embedding service",
     )
 
-    @computed_field
     @property
-    def dimension(self) -> int:
-        return int(self.raw_dimension)
+    def model_optioned(self) -> str:
+        return self.model
 
-    @computed_field
     @property
-    def service(self) -> Embeddings:
-        return _get_embedding_service(self.api_key, self.model)
+    def dimension_optioned(self) -> int:
+        return int(self.dimension)
+
+    @property
+    def api_key_optioned(self) -> SecretStr:
+        return SecretStr(self.api_key)

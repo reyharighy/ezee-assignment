@@ -1,4 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
+
+from .settings_env import model_config
 
 
 def _default_cors_allowed_origins() -> list[str]:
@@ -13,7 +16,9 @@ def _default_dev_origin_regex() -> str:
     return r"https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$"
 
 
-class MiddlewareConfig(BaseModel):
+class MiddlewareConfig(BaseSettings):
+    model_config = model_config()
+
     allowed_origins: list[str] = Field(
         default_factory=_default_cors_allowed_origins,
         validate_default=True,

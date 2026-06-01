@@ -9,15 +9,14 @@ from app.services import (
     llm_with_retry,
 )
 
-from app.services.prompt_templates import (
+from app.config import get_settings
+from app.database.tables import VectorDocument
+from app.database.tables.prompt_templates import (
     REFINE_SYSTEM,
     RESPONSE_SYSTEM,
     get_template_body,
 )
-
-from app.config import get_settings
-from app.database.tables import VectorDocument
-
+from app.services import get_embedding_service
 from .composer import compose_last_human_message_for_node
 from .runtime import Context
 from .schemas import RefinedRetrievalQuery
@@ -57,7 +56,7 @@ def refine_query(state: State, runtime: Runtime[Context]) -> dict[str, Any]:
 
 
 def get_relevant_docs(state: State, runtime: Runtime[Context]) -> dict[str, Any]:
-    vector_document = VectorDocument(_embedding_cfg.service)
+    vector_document = VectorDocument(get_embedding_service())
     query_text = cast(str, state.get("refined_query") or "").strip()
 
     if not query_text:

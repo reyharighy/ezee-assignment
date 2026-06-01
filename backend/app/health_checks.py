@@ -13,6 +13,7 @@ from sqlalchemy.pool import NullPool
 
 from app.storage import STORAGE_DIR
 from app.config import get_settings
+from app.services import get_embedding_service
 
 
 class ComponentStatus(TypedDict):
@@ -46,19 +47,11 @@ _cached_embedding: ModelStatus | None = None
 _cached_llm: ModelStatus | None = None
 _cached_provider_probe_iso: str | None = None
 
-_database_cfg = get_settings().database
-_job_queue_cfg = get_settings().job_queue
-_embedding_cfg = get_settings().embedding
-
-
-def _parse_provider_cache_ttl_seconds() -> float:
-    raw = os.getenv("HEALTH_PROVIDER_CACHE_TTL_SECONDS", "300").strip()
-
-    try:
-        v = float(raw)
-    except ValueError:
-        return 300.0
-    return max(0.0, v)
+_settings = get_settings()
+_database_cfg = _settings.database
+_job_queue_cfg = _settings.job_queue
+_embedding_cfg = _settings.embedding
+_health_check_cfg = _settings.health_check
 
 
 def _annotate_model_probe(
@@ -86,24 +79,24 @@ def _count_storage_files(root: Path) -> int:
 
 def check_embedding_model() -> ModelStatus:
     try:
-        emb = _embedding_cfg.service
+        emb = get_embedding_service()
         emb.embed_query("health")
     except Exception as e:  # noqa: BLE001 — surface any provider/transport failure
         return {
             "status": "error",
             "detail": _truncate(str(e)),
-            "name": _embedding_cfg.model,
+            "name": _embedding_cfg.model_optioned,
         }
 
     return {
         "status": "ok",
         "detail": None,
-        "name": _embedding_cfg.model,
+        "name": _embedding_cfg.model_optioned,
     }
 
 
 def check_llm_model() -> ModelStatus:
-    from app.services.language_model import (
+    from app.services import (
         get_language_model,
         llm_with_retry,
     )
@@ -152,7 +145,7 @@ def check_worker() -> WorkerStatus:
 
     try:
         client = Redis.from_url(
-            _job_queue_cfg.url,
+            _job_queue_cfg.url_optioned,
             socket_connect_timeout=2,
             socket_timeout=2,
         )
@@ -216,7 +209,7 @@ def get_cached_provider_model_statuses() -> tuple[ModelStatus, ModelStatus]:
         _cached_provider_probe_iso, \
         _provider_cache_expires_at
 
-    ttl = _parse_provider_cache_ttl_seconds()
+    ttl = _health_check_cfg.provider_cache_ttl_optioned
     iso_now = datetime.now(timezone.utc).isoformat()
 
     if ttl <= 0:

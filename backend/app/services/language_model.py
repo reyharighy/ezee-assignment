@@ -1,4 +1,5 @@
 from typing import Literal, TypedDict, Unpack
+from functools import lru_cache
 
 from groq import BadRequestError
 from langchain_core.language_models.base import LanguageModelInput
@@ -25,6 +26,7 @@ def llm_with_retry(
     return runnable.with_retry(retry_if_exception_type=(BadRequestError,))
 
 
+@lru_cache(maxsize=1)
 def get_language_model(**kwargs: Unpack[ModelKwargs]):
     model = kwargs.get("model", "openai/gpt-oss-20b")
     temperature = float(kwargs.get("temperature", 0))
@@ -33,7 +35,7 @@ def get_language_model(**kwargs: Unpack[ModelKwargs]):
     reasoning_effort = kwargs.get("reasoning_effort", "low")
 
     return ChatGroq(
-        api_key=language_model_cfg.api_key,
+        api_key=language_model_cfg.api_key_optioned,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
