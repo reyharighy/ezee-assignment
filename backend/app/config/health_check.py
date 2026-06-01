@@ -6,12 +6,12 @@ from pydantic_settings import BaseSettings
 from .settings_env import model_config
 
 
-HEALTH_PROVIDER_CACHE_TTL_DEFAULT = 300
+HEALTH_CHECK_PROVIDER_CACHE_TTL_DEFAULT = 300
 
 
 def parse_provider_cache_ttl(value: str) -> str:
     if value.strip() == "":
-        return str(HEALTH_PROVIDER_CACHE_TTL_DEFAULT)
+        return str(HEALTH_CHECK_PROVIDER_CACHE_TTL_DEFAULT)
 
     if int(value.strip()) <= 0:
         raise ValueError("HEALTH_CHECK_PROVIDER_CACHE_TTL must be a positive number")
