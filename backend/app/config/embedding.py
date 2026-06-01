@@ -12,7 +12,7 @@ ALLOWED_EMBEDDING_MODELS = [
     "embed-multilingual-v3.0",
 ]
 
-ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT = [
+ALLOWED_EMBEDDING_DIMENSION_DEFAULT = [
     384,
     768,
     1024,
@@ -37,14 +37,14 @@ def parse_model(value: str) -> str:
 
 def parse_dimension(value: str) -> str:
     if value.strip() == "":
-        return str(ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT[2])
+        return str(ALLOWED_EMBEDDING_DIMENSION_DEFAULT[2])
 
-    if int(value.strip()) in ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT:
+    if int(value.strip()) in ALLOWED_EMBEDDING_DIMENSION_DEFAULT:
         return value.strip()
 
     raise ValueError(
         "EMBEDDING_DIMENSION must be one of the following: "
-        + ", ".join(map(str, ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT))
+        + ", ".join(map(str, ALLOWED_EMBEDDING_DIMENSION_DEFAULT))
     )
 
 
