@@ -18,6 +18,7 @@ def parse_provider_cache_ttl(value: str) -> str:
 
     return value.strip()
 
+
 ProviderCacheTtl = Annotated[str, BeforeValidator(parse_provider_cache_ttl)]
 
 

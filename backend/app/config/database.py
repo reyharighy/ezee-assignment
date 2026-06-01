@@ -30,9 +30,11 @@ def parse_name(value: str) -> str:
 
     return value
 
+
 @lru_cache(maxsize=1)
 def _get_url(username: str, password: str, name: str) -> str:
     return f"postgresql+psycopg://{username}:{password}@database:5432/{name}"
+
 
 @lru_cache(maxsize=1)
 def _get_engine(url: str) -> PGEngine:
@@ -59,20 +61,9 @@ class DatabaseConfig(BaseSettings):
         arbitrary_types_allowed=True,
     )
 
-    username: UserName = Field(
-        exclude=True,
-        description="Username for the database"
-    )
-
-    password: Password = Field(
-        exclude=True,
-        description="Password for the database"
-    )
-
-    name: Name = Field(
-        exclude=True,
-        description="Name of the database"
-    )
+    username: UserName = Field(exclude=True, description="Username for the database")
+    password: Password = Field(exclude=True, description="Password for the database")
+    name: Name = Field(exclude=True, description="Name of the database")
 
     @computed_field
     @property
