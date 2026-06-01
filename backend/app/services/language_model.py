@@ -25,6 +25,7 @@ def llm_with_retry(
 ) -> Runnable[LanguageModelInput, dict | BaseModel]:
     return runnable.with_retry(retry_if_exception_type=(BadRequestError,))
 
+
 @lru_cache(maxsize=1)
 def get_language_model(**kwargs: Unpack[ModelKwargs]):
     model = kwargs.get("model", "openai/gpt-oss-20b")

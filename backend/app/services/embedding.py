@@ -6,6 +6,7 @@ from app.config import get_settings
 
 embedding_cfg = get_settings().embedding
 
+
 @lru_cache(maxsize=1)
 def get_embedding_service() -> Embeddings:
     return CohereEmbeddings(
