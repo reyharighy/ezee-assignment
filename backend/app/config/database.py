@@ -54,18 +54,18 @@ DatabaseName = Annotated[str, BeforeValidator(parse_database_name)]
 
 class DatabaseConfig(BaseSettings):
     model_config = model_config(
-        env_prefix="DATABASE_",
+        env_prefix="DATABASE",
         arbitrary_types_allowed=True,
     )
 
-    username: UserName = Field(description="Username for the database")
-    password: Password = Field(description="Password for the database")
-    name: DatabaseName = Field(description="Name of the database")
+    _username: UserName = Field(description="Username for the database")
+    _password: Password = Field(description="Password for the database")
+    _name: DatabaseName = Field(description="Name of the database")
 
     @computed_field
     @property
     def database_url(self) -> str:
-        return _get_database_url(self.username, self.password, self.name)
+        return _get_database_url(self._username, self._password, self._name)
 
     @computed_field
     @property
