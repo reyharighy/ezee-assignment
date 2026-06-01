@@ -1,4 +1,5 @@
 from typing import Literal, TypedDict, Unpack
+from functools import lru_cache
 
 from groq import BadRequestError
 from langchain_core.language_models.base import LanguageModelInput
@@ -24,7 +25,7 @@ def llm_with_retry(
 ) -> Runnable[LanguageModelInput, dict | BaseModel]:
     return runnable.with_retry(retry_if_exception_type=(BadRequestError,))
 
-
+@lru_cache(maxsize=1)
 def get_language_model(**kwargs: Unpack[ModelKwargs]):
     model = kwargs.get("model", "openai/gpt-oss-20b")
     temperature = float(kwargs.get("temperature", 0))
