@@ -28,7 +28,6 @@ def parse_name(value: str) -> str:
     return value.strip()
 
 
-@lru_cache(maxsize=1)
 def _get_url(username: str, password: str, name: str) -> str:
     return f"postgresql+psycopg://{username}:{password}@database:5432/{name}"
 
