@@ -33,7 +33,7 @@ def get_language_model(**kwargs: Unpack[ModelKwargs]):
     reasoning_effort = kwargs.get("reasoning_effort", "low")
 
     return ChatGroq(
-        api_key=language_model_cfg.api_key,
+        api_key=language_model_cfg.api_key_optioned,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
