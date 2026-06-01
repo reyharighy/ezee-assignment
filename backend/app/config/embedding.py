@@ -55,14 +55,6 @@ def parse_api_key(value: str) -> str:
     return value.strip()
 
 
-@lru_cache(maxsize=1)
-def _get_embedding_service(api_key: SecretStr, model: "Model") -> Embeddings:
-    return CohereEmbeddings(
-        cohere_api_key=api_key.get_secret_value(),
-        model=model,
-    )  # type: ignore
-
-
 Model = Annotated[str, BeforeValidator(parse_model)]
 Dimension = Annotated[str, BeforeValidator(parse_dimension)]
 ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
@@ -93,7 +85,6 @@ class EmbeddingConfig(BaseSettings):
     def dimension_optioned(self) -> int:
         return int(self.dimension)
 
-    @computed_field
     @property
-    def service(self) -> Embeddings:
-        return _get_embedding_service(SecretStr(self.api_key), self.model)
+    def api_key_optioned(self) -> SecretStr:
+        return SecretStr(self.api_key)

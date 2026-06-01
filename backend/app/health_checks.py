@@ -13,6 +13,7 @@ from sqlalchemy.pool import NullPool
 
 from app.storage import STORAGE_DIR
 from app.config import get_settings
+from app.services.embedding import get_embedding_service
 
 
 class ComponentStatus(TypedDict):
@@ -78,7 +79,7 @@ def _count_storage_files(root: Path) -> int:
 
 def check_embedding_model() -> ModelStatus:
     try:
-        emb = _embedding_cfg.service
+        emb = get_embedding_service()
         emb.embed_query("health")
     except Exception as e:  # noqa: BLE001 — surface any provider/transport failure
         return {
