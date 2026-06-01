@@ -22,7 +22,7 @@ ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT = [
 ]
 
 
-def parse_embedding_model(value: str) -> str:
+def parse_model(value: str) -> str:
     if value.strip() == "":
         return ALLOWED_EMBEDDING_MODELS[0]
 
@@ -35,7 +35,7 @@ def parse_embedding_model(value: str) -> str:
     )
 
 
-def parse_embedding_dimension(value: str) -> str:
+def parse_dimension(value: str) -> str:
     if value.strip() == "":
         return str(ALLOWED_VECTOR_EMBEDDING_DIMENSION_DEFAULT[2])
 
@@ -63,8 +63,8 @@ def _get_embedding_service(api_key: "ApiKey", model: "Model") -> Embeddings:
     )  # type: ignore
 
 
-Model = Annotated[str, BeforeValidator(parse_embedding_model)]
-Dimension = Annotated[str, BeforeValidator(parse_embedding_dimension)]
+Model = Annotated[str, BeforeValidator(parse_model)]
+Dimension = Annotated[str, BeforeValidator(parse_dimension)]
 ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
 
 
