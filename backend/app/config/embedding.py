@@ -58,7 +58,7 @@ def parse_api_key(value: str) -> str:
 @lru_cache(maxsize=1)
 def _get_embedding_service(api_key: SecretStr, model: "Model") -> Embeddings:
     return CohereEmbeddings(
-        cohere_api_key=api_key,
+        cohere_api_key=api_key.get_secret_value(),
         model=model,
     )  # type: ignore
 
