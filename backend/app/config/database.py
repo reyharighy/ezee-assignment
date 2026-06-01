@@ -30,21 +30,22 @@ def parse_database_name(value: str) -> str:
 
     return value
 
-def _get_database_url(username: str, password: str, name: str) -> str:
+@lru_cache(maxsize=1)
+def _get_url(username: str, password: str, name: str) -> str:
     return f"postgresql+psycopg://{username}:{password}@database:5432/{name}"
 
 @lru_cache(maxsize=1)
-def _get_engine(database_url: str) -> PGEngine:
-    return PGEngine.from_connection_string(database_url)
+def _get_engine(url: str) -> PGEngine:
+    return PGEngine.from_connection_string(url)
 
 
 @lru_cache(maxsize=1)
-def _get_psycopg_connection(database_url: str) -> psycopg.Connection[TupleRow]:
+def _get_psycopg_connection(url: str) -> psycopg.Connection[TupleRow]:
     for prefix in ("postgresql+psycopg://",):
-        if database_url.startswith(prefix):
-            return psycopg.connect(f"postgresql://{database_url[len(prefix) :]}")
+        if url.startswith(prefix):
+            return psycopg.connect(f"postgresql://{url[len(prefix) :]}")
 
-    return psycopg.connect(database_url)
+    return psycopg.connect(url)
 
 
 UserName = Annotated[str, BeforeValidator(parse_username)]
@@ -64,15 +65,15 @@ class DatabaseConfig(BaseSettings):
 
     @computed_field
     @property
-    def database_url(self) -> str:
-        return _get_database_url(self._username, self._password, self._name)
+    def url(self) -> str:
+        return _get_url(self._username, self._password, self._name)
 
     @computed_field
     @property
     def engine(self) -> PGEngine:
-        return _get_engine(self.database_url)
+        return _get_engine(self.url)
 
     @computed_field
     @property
     def psycopg_connection(self) -> psycopg.Connection[TupleRow]:
-        return _get_psycopg_connection(self.database_url)
+        return _get_psycopg_connection(self.url)
