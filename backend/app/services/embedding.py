@@ -1,5 +1,4 @@
 from functools import lru_cache
-from pydantic import SecretStr
 from langchain_cohere import CohereEmbeddings
 from langchain_core.embeddings import Embeddings
 from app.config import get_settings

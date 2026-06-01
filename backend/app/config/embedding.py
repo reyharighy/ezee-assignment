@@ -1,10 +1,7 @@
 from typing import Annotated
 
-from functools import lru_cache
-from pydantic import BeforeValidator, Field, computed_field, SecretStr
+from pydantic import BeforeValidator, Field, SecretStr
 from pydantic_settings import BaseSettings
-from langchain_cohere import CohereEmbeddings
-from langchain_core.embeddings import Embeddings
 
 from .settings_env import model_config
 

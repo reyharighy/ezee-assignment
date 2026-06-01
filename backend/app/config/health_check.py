@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BeforeValidator, Field, computed_field
+from pydantic import BeforeValidator, Field
 from pydantic_settings import BaseSettings
 
 from .settings_env import model_config
