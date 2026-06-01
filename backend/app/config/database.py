@@ -1,11 +1,13 @@
-import os
 from functools import lru_cache
 from typing import Annotated
 
 import psycopg
 from psycopg.rows import TupleRow
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, computed_field
+from pydantic import BeforeValidator, Field, computed_field
+from pydantic_settings import BaseSettings
 from langchain_postgres import PGEngine
+
+from .settings_env import model_config
 
 
 def parse_username(value: str) -> str:
@@ -48,28 +50,15 @@ Password = Annotated[str, BeforeValidator(parse_password)]
 DatabaseName = Annotated[str, BeforeValidator(parse_database_name)]
 
 
-class DatabaseConfig(BaseModel):
-    model_config = ConfigDict(
+class DatabaseConfig(BaseSettings):
+    model_config = model_config(
+        env_prefix="DATABASE_",
         arbitrary_types_allowed=True,
     )
 
-    username: UserName = Field(
-        default_factory=lambda: os.getenv("DATABASE_USERNAME", ""),
-        validate_default=True,
-        description="Username for the database",
-    )
-
-    password: Password = Field(
-        default_factory=lambda: os.getenv("DATABASE_PASSWORD", ""),
-        validate_default=True,
-        description="Password for the database",
-    )
-
-    name: DatabaseName = Field(
-        default_factory=lambda: os.getenv("DATABASE_NAME", ""),
-        validate_default=True,
-        description="Name of the database",
-    )
+    username: UserName = Field(description="Username for the database")
+    password: Password = Field(description="Password for the database")
+    name: DatabaseName = Field(description="Name of the database")
 
     @computed_field
     @property
