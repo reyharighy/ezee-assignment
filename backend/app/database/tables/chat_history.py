@@ -7,9 +7,11 @@ from sqlalchemy.exc import ProgrammingError
 
 from .base import Table
 from app.config import get_settings
+from app.services import get_psycopg_connection
 
 logger = logging.getLogger("uvicorn.error")
 _database_cfg = get_settings().database
+psycopg_connection = get_psycopg_connection(_database_cfg.url)
 
 CHAT_MESSAGE_HISTORIES_TABLE_NAME = "chat_message_histories"
 
@@ -19,14 +21,14 @@ class ChatMessageHistories(Table):
         self.service = PostgresChatMessageHistory(
             CHAT_MESSAGE_HISTORIES_TABLE_NAME,
             session_id,
-            sync_connection=_database_cfg.psycopg_connection,
+            sync_connection=psycopg_connection,
         )
 
     @staticmethod
     def create_table() -> None:
         try:
             PostgresChatMessageHistory.create_tables(
-                _database_cfg.psycopg_connection,
+                psycopg_connection,
                 CHAT_MESSAGE_HISTORIES_TABLE_NAME,
             )
         except ProgrammingError as e:

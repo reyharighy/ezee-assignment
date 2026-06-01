@@ -8,10 +8,12 @@ from sqlalchemy.exc import ProgrammingError
 
 from .base import Table
 from app.config import get_settings
+from app.services import get_engine
 
 logger = logging.getLogger("uvicorn.error")
 _database_cfg = get_settings().database
 _embedding_cfg = get_settings().embedding
+engine = get_engine(_database_cfg.url)
 
 VECTOR_STORE_TABLE_NAME = "documents"
 
@@ -19,7 +21,7 @@ VECTOR_STORE_TABLE_NAME = "documents"
 class VectorDocument(Table):
     def __init__(self, embedding_service: Embeddings):
         self.service = PGVectorStore.create_sync(
-            engine=_database_cfg.engine,
+            engine=engine,
             table_name=VECTOR_STORE_TABLE_NAME,
             embedding_service=embedding_service,
         )
@@ -27,7 +29,7 @@ class VectorDocument(Table):
     @staticmethod
     def create_table() -> None:
         try:
-            _database_cfg.engine.init_vectorstore_table(
+            engine.init_vectorstore_table(
                 table_name=VECTOR_STORE_TABLE_NAME,
                 vector_size=_embedding_cfg.dimension_optioned,
             )
