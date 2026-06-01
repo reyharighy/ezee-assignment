@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from app.services.prompt_templates import (
+from app.database.tables.prompt_templates import (
     TEMPLATE_KEYS,
     list_prompt_templates,
     set_template_body,
