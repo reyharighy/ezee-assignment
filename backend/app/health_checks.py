@@ -84,13 +84,13 @@ def check_embedding_model() -> ModelStatus:
         return {
             "status": "error",
             "detail": _truncate(str(e)),
-            "name": _embedding_cfg.model,
+            "name": _embedding_cfg.model_optioned,
         }
 
     return {
         "status": "ok",
         "detail": None,
-        "name": _embedding_cfg.model,
+        "name": _embedding_cfg.model_optioned,
     }
 
 
@@ -208,7 +208,7 @@ def get_cached_provider_model_statuses() -> tuple[ModelStatus, ModelStatus]:
         _cached_provider_probe_iso, \
         _provider_cache_expires_at
 
-    ttl = _health_check_cfg.provider_cache_ttl
+    ttl = _health_check_cfg.provider_cache_ttl_optioned
     iso_now = datetime.now(timezone.utc).isoformat()
 
     if ttl <= 0:

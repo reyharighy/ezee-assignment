@@ -24,7 +24,7 @@ def parse_password(value: str) -> str:
     return value
 
 
-def parse_database_name(value: str) -> str:
+def parse_name(value: str) -> str:
     if value.strip() == "":
         raise ValueError("DATABASE_NAME is not set")
 
@@ -50,23 +50,34 @@ def _get_psycopg_connection(url: str) -> psycopg.Connection[TupleRow]:
 
 UserName = Annotated[str, BeforeValidator(parse_username)]
 Password = Annotated[str, BeforeValidator(parse_password)]
-DatabaseName = Annotated[str, BeforeValidator(parse_database_name)]
+Name = Annotated[str, BeforeValidator(parse_name)]
 
 
 class DatabaseConfig(BaseSettings):
     model_config = model_config(
-        env_prefix="DATABASE",
+        env_prefix="DATABASE_",
         arbitrary_types_allowed=True,
     )
 
-    _username: UserName = Field(description="Username for the database")
-    _password: Password = Field(description="Password for the database")
-    _name: DatabaseName = Field(description="Name of the database")
+    username: UserName = Field(
+        exclude=True,
+        description="Username for the database"
+    )
+
+    password: Password = Field(
+        exclude=True,
+        description="Password for the database"
+    )
+
+    name: Name = Field(
+        exclude=True,
+        description="Name of the database"
+    )
 
     @computed_field
     @property
     def url(self) -> str:
-        return _get_url(self._username, self._password, self._name)
+        return _get_url(self.username, self.password, self.name)
 
     @computed_field
     @property

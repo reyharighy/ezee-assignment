@@ -23,15 +23,15 @@ ProviderCacheTtl = Annotated[str, BeforeValidator(parse_provider_cache_ttl)]
 
 class HealthCheckConfig(BaseSettings):
     model_config = model_config(
-        env_prefix="HEALTH_CHECK",
+        env_prefix="HEALTH_CHECK_",
     )
 
-    _provider_cache_ttl: ProviderCacheTtl = Field(
+    provider_cache_ttl: ProviderCacheTtl = Field(
+        exclude=True,
         default="",
         description="TTL of the provider cache in seconds",
     )
 
-    @computed_field
     @property
-    def provider_cache_ttl(self) -> int:
-        return int(self._provider_cache_ttl)
+    def provider_cache_ttl_optioned(self) -> int:
+        return int(self.provider_cache_ttl)

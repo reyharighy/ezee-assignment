@@ -29,7 +29,7 @@ class VectorDocument(Table):
         try:
             _database_cfg.engine.init_vectorstore_table(
                 table_name=VECTOR_STORE_TABLE_NAME,
-                vector_size=_embedding_cfg.dimension,
+                vector_size=_embedding_cfg.dimension_optioned,
             )
         except ProgrammingError as e:
             if Table.is_duplicate_table_error(e):

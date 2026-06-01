@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from functools import lru_cache
-from pydantic import BeforeValidator, Field, computed_field
+from pydantic import BeforeValidator, Field, computed_field, SecretStr
 from pydantic_settings import BaseSettings
 from langchain_cohere import CohereEmbeddings
 from langchain_core.embeddings import Embeddings
@@ -56,7 +56,7 @@ def parse_api_key(value: str) -> str:
 
 
 @lru_cache(maxsize=1)
-def _get_embedding_service(api_key: "ApiKey", model: "Model") -> Embeddings:
+def _get_embedding_service(api_key: SecretStr, model: "Model") -> Embeddings:
     return CohereEmbeddings(
         cohere_api_key=api_key,
         model=model,
@@ -70,36 +70,37 @@ ApiKey = Annotated[str, BeforeValidator(parse_api_key)]
 
 class EmbeddingConfig(BaseSettings):
     model_config = model_config(
-        env_prefix="EMBEDDING",
+        env_prefix="EMBEDDING_",
         arbitrary_types_allowed=True
     )
 
-    _model: Model = Field(
+    model: Model = Field(
+        exclude=True,
         default="",
         description="Model of the embedding service"
     )
 
-    _dimension: Dimension = Field(
+    dimension: Dimension = Field(
+        exclude=True,
         default="",
         description="Dimension of stored embedding vectors"
     )
 
-    _api_key: ApiKey = Field(
+    api_key: ApiKey = Field(
+        exclude=True,
         validation_alias="COHERE_API_KEY",
         description="API key of the embedding service",
     )
 
-    @computed_field
     @property
-    def model(self) -> str:
-        return self._model
+    def model_optioned(self) -> str:
+        return self.model
 
-    @computed_field
     @property
-    def dimension(self) -> int:
-        return int(self._dimension)
+    def dimension_optioned(self) -> int:
+        return int(self.dimension)
 
     @computed_field
     @property
     def service(self) -> Embeddings:
-        return _get_embedding_service(self._api_key, self._model)
+        return _get_embedding_service(SecretStr(self.api_key), self.model)
