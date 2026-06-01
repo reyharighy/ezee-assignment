@@ -42,7 +42,7 @@ def _enqueue_upload_job(file: UploadFile) -> dict:
         file.filename,
         file.content_type,
         file_path.stat().st_size,
-        result_ttl=_job_queue_cfg.result_ttl,
+        result_ttl=_job_queue_cfg.result_ttl_optioned,
     )
 
     return {"ok": True, "file_name": file.filename}
