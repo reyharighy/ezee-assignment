@@ -144,7 +144,7 @@ def check_worker() -> WorkerStatus:
 
     try:
         client = Redis.from_url(
-            _job_queue_cfg.url,
+            _job_queue_cfg.url_optioned,
             socket_connect_timeout=2,
             socket_timeout=2,
         )
