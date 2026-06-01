@@ -46,19 +46,11 @@ _cached_embedding: ModelStatus | None = None
 _cached_llm: ModelStatus | None = None
 _cached_provider_probe_iso: str | None = None
 
-_database_cfg = get_settings().database
-_job_queue_cfg = get_settings().job_queue
-_embedding_cfg = get_settings().embedding
-
-
-def _parse_provider_cache_ttl_seconds() -> float:
-    raw = os.getenv("HEALTH_PROVIDER_CACHE_TTL_SECONDS", "300").strip()
-
-    try:
-        v = float(raw)
-    except ValueError:
-        return 300.0
-    return max(0.0, v)
+_settings = get_settings()
+_database_cfg = _settings.database
+_job_queue_cfg = _settings.job_queue
+_embedding_cfg = _settings.embedding
+_health_check_cfg = _settings.health_check
 
 
 def _annotate_model_probe(
@@ -216,7 +208,7 @@ def get_cached_provider_model_statuses() -> tuple[ModelStatus, ModelStatus]:
         _cached_provider_probe_iso, \
         _provider_cache_expires_at
 
-    ttl = _parse_provider_cache_ttl_seconds()
+    ttl = _health_check_cfg.provider_cache_ttl
     iso_now = datetime.now(timezone.utc).isoformat()
 
     if ttl <= 0:
